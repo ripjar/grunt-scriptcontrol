@@ -28,27 +28,43 @@ module.exports = function(grunt) {
     var options = this.options();
     var data = this.data;
 
-
-
     this.files.forEach(function (fileMap) {
       var dest = fileMap.dest;
       var scripts = [];
       var styles = [];
 
-      fileMap.orig.src.forEach(function (filename) {
-        var name = options.process ? options.process(filename) : filename;
+      var destFile = grunt.file.read(dest).toString();
+
+      fileMap.src.forEach(function (filename) {
+        var path = options.process ? options.process(filename) : filename;
+
+        if (options.cachebuster) {
+
+          var oldline = new RegExp(path + '(\\?(\\d+))?', 'mi');
+          path = path + '?' + (typeof options.cachebuster === 'function' ? options.cachebuster() : options.cachebuster);
+
+          if (options.replaceIndividually) {
+            destFile = destFile.replace(oldline, path)
+          }
+        }
+
         if (filename.match(/js$/)) {
-          scripts.push(SCRIPT_TAG.replace('%s', name));
+          scripts.push(SCRIPT_TAG.replace('%s', path));
         }
         else if (filename.match(/css$/)) {
-          styles.push(CSS_TAG.replace('%s', name));
+          styles.push(CSS_TAG.replace('%s', path));
         }
       });
 
-      var destFile = grunt.file.read(dest).toString();
-      destFile = destFile
-        .replace(SCRIPT_REGEX, SCRIPT_START + '\n\t\t' + scripts.join('\n\t\t') + '\n\t\t' + SCRIPT_END)
-        .replace(CSS_REGEX, CSS_START + '\n\t\t' + styles.join('\n\t\t') + '\n\t\t' + CSS_END);
+
+
+
+      if (!options.replaceIndividually) {
+        destFile = destFile
+          .replace(SCRIPT_REGEX, SCRIPT_START + '\n\t\t' + scripts.join('\n\t\t') + '\n\t\t' + SCRIPT_END)
+          .replace(CSS_REGEX, CSS_START + '\n\t\t' + styles.join('\n\t\t') + '\n\t\t' + CSS_END);
+      }
+
 
 
       grunt.file.write(dest, destFile, {
