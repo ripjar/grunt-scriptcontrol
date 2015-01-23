@@ -19,7 +19,7 @@ module.exports = function(grunt) {
   var SCRIPT_REGEX = /<!-- start:scripts -->([\s\S]+)<!-- end:scripts -->/;
 
   var CSS_TAG = '<link rel="stylesheet" type="text/css" href="%s" >';
-  var CSS_START = '<!-- start:styles  -->';
+  var CSS_START = '<!-- start:styles -->';
   var CSS_END = '<!-- end:styles -->';
   var CSS_REGEX = /<!-- start:styles -->([\s\S]+)<!-- end:styles -->/;
 
