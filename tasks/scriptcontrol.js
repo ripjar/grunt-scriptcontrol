@@ -35,19 +35,19 @@ module.exports = function(grunt) {
 
       var destFile = grunt.file.read(dest).toString();
 
-      fileMap.src.forEach(function (filename) {
+      fileMap.orig.src.forEach(function (filename) {
         var path = options.process ? options.process(filename) : filename;
 
-        if (options.cachebuster) {
+        // if (options.cachebuster) {
 
-          var oldline = new RegExp(path + '(\\?(\\d+))?', 'mi');
-          path = path + '?' + (typeof options.cachebuster === 'function' ? options.cachebuster() : options.cachebuster);
+        //   var oldline = new RegExp(path + '(\\?(\\d+))?', 'mi');
+        //   path = path + '?' + (typeof options.cachebuster === 'function' ? options.cachebuster() : options.cachebuster);
 
-          if (options.replaceIndividually) {
-            destFile = destFile.replace(oldline, path)
-          }
-        }
-
+        //   if (options.replaceIndividually) {
+        //     destFile = destFile.replace(oldline, path)
+        //   }
+        // }
+        // console.log(path)
         if (filename.match(/js$/)) {
           scripts.push(SCRIPT_TAG.replace('%s', path));
         }
@@ -56,16 +56,9 @@ module.exports = function(grunt) {
         }
       });
 
-
-
-
-      if (!options.replaceIndividually) {
-        destFile = destFile
-          .replace(SCRIPT_REGEX, SCRIPT_START + '\n\t\t' + scripts.join('\n\t\t') + '\n\t\t' + SCRIPT_END)
-          .replace(CSS_REGEX, CSS_START + '\n\t\t' + styles.join('\n\t\t') + '\n\t\t' + CSS_END);
-      }
-
-
+      destFile = destFile
+        .replace(SCRIPT_REGEX, SCRIPT_START + '\n\t\t' + scripts.join('\n\t\t') + '\n\t\t' + SCRIPT_END)
+        .replace(CSS_REGEX, CSS_START + '\n\t\t' + styles.join('\n\t\t') + '\n\t\t' + CSS_END);
 
       grunt.file.write(dest, destFile, {
         encoding: 'utf8'
